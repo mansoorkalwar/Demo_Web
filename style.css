@@ -995,8 +995,22 @@ main {
   display: block;
   width: 100%;
   height: 230px;
-  object-fit: cover;
-  background: #000;
+
+  /*
+    Show the complete photo/video inside the memory frame.
+    "contain" prevents faces, heads, or other important parts
+    from being cropped when photos have different aspect ratios.
+  */
+  object-fit: contain;
+  object-position: center;
+
+  /*
+    White matches the Polaroid-style memory card and prevents
+    ugly dark bars when an image is narrower/taller than the frame.
+  */
+  background: #fff;
+
+  border-radius: 1px;
 }
 
 /* VIDEO MEMORY FRAME */
@@ -1005,10 +1019,42 @@ main {
   overflow: hidden;
 }
 
-/* Make sure video stays inside card */
+/* Keep videos completely inside the card */
 
 .video-memory video {
   max-width: 100%;
+  max-height: 230px;
+}
+
+/*
+  Keep all memory media consistent on smaller screens.
+  The full image/video remains visible instead of being cropped.
+*/
+
+@media (max-width: 700px) {
+  .photo-grid img,
+  .photo-grid video {
+    height: 180px;
+    object-fit: contain;
+    background: #fff;
+  }
+
+  .video-memory video {
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 430px) {
+  .photo-grid img,
+  .photo-grid video {
+    height: 260px;
+    object-fit: contain;
+    background: #fff;
+  }
+
+  .video-memory video {
+    max-height: 260px;
+  }
 }
 
 /* =========================
@@ -1382,13 +1428,6 @@ main {
     gap: 12px;
   }
 
-  /* AUTOMATIC PHOTO + VIDEO SIZE */
-
-  .photo-grid img,
-  .photo-grid video {
-    height: 180px;
-  }
-
   .photo-grid figcaption {
     font-size: 14px;
   }
@@ -1450,13 +1489,6 @@ main {
 
   .photo-grid {
     grid-template-columns: 1fr;
-  }
-
-  /* AUTOMATIC LARGE VIDEO + PHOTO FRAME */
-
-  .photo-grid img,
-  .photo-grid video {
-    height: 260px;
   }
 
   .envelope-wrap {
