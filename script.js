@@ -396,6 +396,35 @@ document.addEventListener('keydown', (event) => {
 });
 
 /* ----------------------------------------
+   Video thumbnail fix
+   Some browsers (especially on mobile) show
+   a black frame for a <video> until it has
+   actually decoded a frame. Nudging the
+   playhead a hair forward once metadata is
+   ready forces a real frame to be painted.
+---------------------------------------- */
+
+document.querySelectorAll('.photo-grid video').forEach((video) => {
+  const paintFirstFrame = () => {
+    if (video.currentTime === 0) {
+      try {
+        video.currentTime = 0.1;
+      } catch (error) {
+        // Some browsers throw if the media isn't ready yet; safe to ignore.
+      }
+    }
+  };
+
+  video.addEventListener('loadedmetadata', paintFirstFrame);
+  video.addEventListener('loadeddata', paintFirstFrame);
+
+  // If the browser already had the frame cached, run it once immediately.
+  if (video.readyState >= 1) {
+    paintFirstFrame();
+  }
+});
+
+/* ----------------------------------------
    Replay
 ---------------------------------------- */
 

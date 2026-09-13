@@ -826,6 +826,34 @@ main {
 }
 
 /* =========================
+   SWIPE INSTRUCTION
+========================= */
+
+.swipe-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 18px auto 0;
+  max-width: 100%;
+}
+
+.swipe-track span {
+  width: 46px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45));
+  border-radius: 2px;
+}
+
+.swipe-track i {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #bfa2b0;
+  white-space: nowrap;
+}
+
+/* =========================
    PASSCODE
 ========================= */
 
@@ -1126,6 +1154,7 @@ main {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  max-width: 100%;
 }
 
 .nav-tabs button,
@@ -1138,6 +1167,7 @@ main {
   cursor: pointer;
   transition: .25s;
   font-size: .84rem;
+  white-space: nowrap;
 }
 
 .nav-tabs button:hover,
@@ -1478,6 +1508,54 @@ main {
   .cake-wrap,
   .cake-wrap.cut {
     transform: scale(.58) translateY(10px);
+  }
+}
+
+@media (max-width: 380px) {
+
+  .top-nav {
+    padding: 0 10px;
+  }
+
+  .nav-tabs {
+    gap: 2px;
+  }
+
+  .nav-tabs button {
+    font-size: .62rem;
+    padding: 7px 6px;
+  }
+
+  .music-btn {
+    padding: 6px 8px;
+  }
+
+  .cake-wrap,
+  .cake-wrap.cut {
+    transform: scale(.52) translateY(8px);
+  }
+
+  .envelope {
+    width: 96vw;
+    height: 230px;
+  }
+
+  .keypad {
+    grid-template-columns: repeat(3, 62px);
+    gap: 8px;
+  }
+
+  .keypad button {
+    height: 56px;
+  }
+
+  .swipe-track span {
+    width: 30px;
+  }
+
+  .swipe-track i {
+    font-size: 10px;
+    letter-spacing: 2px;
   }
 }
 
