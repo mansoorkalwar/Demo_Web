@@ -178,10 +178,15 @@ const spark = $('#cutSpark');
 const cakeLeft = $('#cakeLeft');
 const cakeRight = $('#cakeRight');
 
-// The original cake SVG exists in the left half.
-// Clone it into the right half so both sides remain visible after the cut.
-if (cakeLeft && cakeRight && !cakeRight.querySelector('.cake-svg')) {
-  const rightCake = cakeLeft.querySelector('.cake-svg')?.cloneNode(true);
+if (
+  cakeLeft &&
+  cakeRight &&
+  !cakeRight.querySelector('.cake-svg')
+) {
+  const rightCake =
+    cakeLeft
+      .querySelector('.cake-svg')
+      ?.cloneNode(true);
 
   if (rightCake) {
     cakeRight.appendChild(rightCake);
@@ -190,68 +195,129 @@ if (cakeLeft && cakeRight && !cakeRight.querySelector('.cake-svg')) {
 
 let dragging = false;
 let startX = 0;
+let startY = 0;
 let cut = false;
 
 function knifeAt(x, y) {
+  if (!stage || !knife) return;
+
   const rect = stage.getBoundingClientRect();
 
-  knife.style.left = `${x - rect.left}px`;
-  knife.style.top = `${y - rect.top}px`;
-  knife.style.opacity = 1;
+  const localX = x - rect.left;
+  const localY = y - rect.top;
+
+  knife.style.left = `${localX}px`;
+  knife.style.top = `${localY}px`;
+
+  knife.style.opacity = '1';
+
+  const progress =
+    Math.min(
+      Math.max((x - startX) / 180, 0),
+      1
+    );
+
+  const angle =
+    -22 + progress * 8;
+
+  knife.style.transform =
+    `translate(-50%, -50%) rotate(${angle}deg)`;
 }
 
 function cutCake() {
-  if (cut) return;
+  if (cut || !cakeWrap) return;
 
   cut = true;
 
-  cakeWrap.classList.add('cut');
-  spark.classList.add('show');
-
-  spark.style.left = '50%';
-  spark.style.top = '42%';
-
-  confetti(110);
+  cakeWrap.classList.add('cutting');
 
   setTimeout(() => {
-    $('#cakeNext')?.classList.remove('hidden');
-  }, 1000);
+    cakeWrap.classList.add('cut');
 
-  setTimeout(() => {
-    spark.classList.remove('show');
-  }, 1000);
+    if (spark) {
+      spark.classList.add('show');
+
+      setTimeout(() => {
+        spark.classList.remove('show');
+      }, 750);
+    }
+
+    confetti(110);
+
+    setTimeout(() => {
+      $('#cakeNext')?.classList.remove('hidden');
+    }, 1200);
+
+  }, 280);
 }
 
-stage?.addEventListener('pointerdown', (event) => {
-  dragging = true;
-  startX = event.clientX;
+stage?.addEventListener(
+  'pointerdown',
+  event => {
 
-  knifeAt(event.clientX, event.clientY);
-  stage.setPointerCapture?.(event.pointerId);
-});
+    if (cut) return;
 
-stage?.addEventListener('pointermove', (event) => {
-  if (!dragging) return;
+    dragging = true;
 
-  knifeAt(event.clientX, event.clientY);
+    startX = event.clientX;
+    startY = event.clientY;
 
-  if (event.clientX - startX > 120) {
-    cutCake();
+    knifeAt(
+      event.clientX,
+      event.clientY
+    );
+
+    stage.setPointerCapture?.(
+      event.pointerId
+    );
   }
-});
+);
+
+stage?.addEventListener(
+  'pointermove',
+  event => {
+
+    if (!dragging || cut) return;
+
+    knifeAt(
+      event.clientX,
+      event.clientY
+    );
+
+    const distance =
+      event.clientX - startX;
+
+    if (distance > 125) {
+      cutCake();
+    }
+  }
+);
 
 function hideKnife() {
+
   dragging = false;
-  knife.style.opacity = 0;
+
+  if (!knife) return;
+
+  knife.style.opacity = '0';
 }
 
-stage?.addEventListener('pointerup', hideKnife);
-stage?.addEventListener('pointercancel', hideKnife);
+stage?.addEventListener(
+  'pointerup',
+  hideKnife
+);
 
-$('#cakeNext')?.addEventListener('click', () => {
-  showScreen('passcodeScreen');
-});
+stage?.addEventListener(
+  'pointercancel',
+  hideKnife
+);
 
+$('#cakeNext')?.addEventListener(
+  'click',
+  () => {
+    showScreen('passcodeScreen');
+  }
+);
 /* ----------------------------------------
    Passcode
 ---------------------------------------- */

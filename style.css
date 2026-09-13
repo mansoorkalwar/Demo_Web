@@ -455,6 +455,10 @@ main {
    CAKE
 ========================= */
 
+/* =========================
+   CAKE
+========================= */
+
 .cake-page {
   padding-top: 18px;
 }
@@ -467,27 +471,39 @@ main {
   display: grid;
   place-items: center;
   touch-action: none;
+  perspective: 1200px;
+  user-select: none;
 }
 
 .cake-shadow {
   position: absolute;
   width: 390px;
-  height: 60px;
+  height: 58px;
   border-radius: 50%;
   background: #000;
-  opacity: .3;
-  filter: blur(18px);
-  bottom: 65px;
+  opacity: .38;
+  filter: blur(20px);
+  bottom: 64px;
+  transition:
+    transform 1.5s cubic-bezier(.2,.8,.2,1),
+    opacity 1.2s ease;
 }
 
 .cake-wrap {
   width: 520px;
   height: 420px;
   position: relative;
-  transform: translateY(25px);
-  filter: drop-shadow(0 30px 25px rgba(0, 0, 0, .25));
-  transition: transform .9s;
+  transform:
+    translateY(25px)
+    rotateX(1deg);
+  transform-style: preserve-3d;
+  filter:
+    drop-shadow(0 30px 25px rgba(0,0,0,.28));
+  transition:
+    transform .5s cubic-bezier(.2,.8,.2,1);
 }
+
+/* Cake halves */
 
 .cake-half {
   position: absolute;
@@ -495,16 +511,31 @@ main {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-.cake-right {
-  background: #0000;
-  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
-  z-index: 2;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .cake-left {
   z-index: 1;
+  clip-path: polygon(
+    0 0,
+    50% 0,
+    50% 100%,
+    0 100%
+  );
+  transform-origin: 50% 50%;
+}
+
+.cake-right {
+  z-index: 2;
+  background: transparent;
+  clip-path: polygon(
+    50% 0,
+    100% 0,
+    100% 100%,
+    50% 100%
+  );
+  transform-origin: 50% 50%;
 }
 
 .cake-svg {
@@ -513,25 +544,108 @@ main {
   display: block;
 }
 
+/* Cutting preparation */
+
+.cake-wrap.cutting {
+  animation: cakePressure .45s ease-in-out;
+}
+
+@keyframes cakePressure {
+  0% {
+    transform:
+      translateY(25px)
+      rotateX(1deg);
+  }
+
+  45% {
+    transform:
+      translateY(31px)
+      rotateX(1deg)
+      scaleX(.992);
+  }
+
+  100% {
+    transform:
+      translateY(25px)
+      rotateX(1deg);
+    }
+}
+
+/* Realistic separation */
+
 .cake-wrap.cut .cake-left {
-  animation: splitLeft 1.1s cubic-bezier(.2, .8, .2, 1) forwards;
+  animation:
+    cakeLeftSeparate 1.45s
+    cubic-bezier(.16,.82,.18,1)
+    forwards;
 }
 
 .cake-wrap.cut .cake-right {
-  animation: splitRight 1.1s cubic-bezier(.2, .8, .2, 1) forwards;
+  animation:
+    cakeRightSeparate 1.45s
+    cubic-bezier(.16,.82,.18,1)
+    forwards;
 }
 
-@keyframes splitLeft {
-  to {
-    transform: translateX(-46px) rotate(-2deg);
+@keyframes cakeLeftSeparate {
+  0% {
+    transform:
+      translateX(0)
+      rotateZ(0)
+      rotateY(0);
+  }
+
+  18% {
+    transform:
+      translateX(-3px)
+      rotateZ(-.3deg)
+      rotateY(-1deg);
+  }
+
+  100% {
+    transform:
+      translateX(-58px)
+      translateY(3px)
+      rotateZ(-1.8deg)
+      rotateY(-3deg);
   }
 }
 
-@keyframes splitRight {
-  to {
-    transform: translateX(46px) rotate(2deg);
+@keyframes cakeRightSeparate {
+  0% {
+    transform:
+      translateX(0)
+      rotateZ(0)
+      rotateY(0);
+  }
+
+  18% {
+    transform:
+      translateX(3px)
+      rotateZ(.3deg)
+      rotateY(1deg);
+  }
+
+  100% {
+    transform:
+      translateX(58px)
+      translateY(3px)
+      rotateZ(1.8deg)
+      rotateY(3deg);
   }
 }
+
+.cake-wrap.cut ~ .cut-spark {
+  pointer-events: none;
+}
+
+/* Cake shadow reacts to separation */
+
+.cake-wrap.cut ~ .cake-shadow {
+  transform: scaleX(1.16);
+  opacity: .27;
+}
+
 
 /* =========================
    KNIFE
@@ -539,66 +653,175 @@ main {
 
 .knife {
   position: absolute;
-  width: 170px;
-  height: 65px;
+  width: 185px;
+  height: 72px;
   opacity: 0;
   pointer-events: none;
-  z-index: 20;
-  transform: translate(-50%, -50%) rotate(-18deg);
-  transition: opacity .15s;
+  z-index: 50;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(-18deg);
+
+  transform-origin: 48% 50%;
+
+  filter:
+    drop-shadow(0 5px 5px rgba(0,0,0,.45));
+
+  transition:
+    opacity .15s ease,
+    transform .12s ease;
 }
 
 .knife-blade {
   position: absolute;
   left: 0;
-  top: 12px;
-  width: 112px;
-  height: 18px;
-  background: linear-gradient(180deg, #fff, #aeb7c2 55%, #707b87);
-  clip-path: polygon(0 0, 100% 0, 86% 100%, 8% 100%);
+  top: 17px;
+  width: 126px;
+  height: 19px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #eef2f5 30%,
+      #aeb7c1 65%,
+      #69737e 100%
+    );
+
+  clip-path:
+    polygon(
+      0 0,
+      100% 0,
+      91% 100%,
+      8% 100%
+    );
+
   border-radius: 3px;
-  box-shadow: 0 2px 4px #0005;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 2px 4px rgba(0,0,0,.45);
+}
+
+.knife-blade::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 15px;
+  top: 4px;
+  height: 2px;
+  background: rgba(255,255,255,.75);
+  border-radius: 50%;
 }
 
 .knife-handle {
   position: absolute;
-  right: 5px;
-  top: 7px;
-  width: 64px;
-  height: 29px;
-  border-radius: 8px 15px 15px 8px;
-  background: linear-gradient(180deg, #333943, #101217);
-  box-shadow: 0 3px 6px #0007;
+  right: 4px;
+  top: 11px;
+  width: 68px;
+  height: 32px;
+
+  border-radius:
+    7px 17px 17px 7px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #454b55 0%,
+      #20242b 45%,
+      #0d0f13 100%
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.18),
+    0 4px 7px rgba(0,0,0,.5);
 }
+
+.knife-handle::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 7px;
+  width: 40px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+}
+
+
+/* =========================
+   CUT EFFECT
+========================= */
 
 .cut-spark {
   position: absolute;
-  font-size: 50px;
-  color: #ffe9b0;
+  left: 50%;
+  top: 42%;
+
+  width: 90px;
+  height: 90px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 42px;
+  color: #ffe8a8;
+
   opacity: 0;
   pointer-events: none;
-  z-index: 30;
-  text-shadow: 0 0 22px #ffd05a;
+  z-index: 60;
+
+  text-shadow:
+    0 0 8px #fff,
+    0 0 22px #ffd05a,
+    0 0 45px rgba(255,180,40,.7);
+
+  transform:
+    translate(-50%,-50%)
+    scale(.3)
+    rotate(-20deg);
 }
 
 .cut-spark.show {
-  animation: spark .8s ease-out;
+  animation:
+    realisticSpark .75s
+    cubic-bezier(.2,.8,.2,1)
+    forwards;
 }
 
-@keyframes spark {
+@keyframes realisticSpark {
+
   0% {
     opacity: 0;
-    transform: scale(.3) rotate(-30deg);
+    transform:
+      translate(-50%,-50%)
+      scale(.25)
+      rotate(-25deg);
   }
 
-  35% {
+  20% {
     opacity: 1;
-    transform: scale(1.2) rotate(10deg);
+    transform:
+      translate(-50%,-50%)
+      scale(.85)
+      rotate(5deg);
+  }
+
+  45% {
+    opacity: .9;
+    transform:
+      translate(-50%,-58%)
+      scale(1.15)
+      rotate(15deg);
   }
 
   100% {
     opacity: 0;
-    transform: scale(1.6) translateY(-20px);
+    transform:
+      translate(-50%,-90%)
+      scale(1.45)
+      rotate(35deg);
   }
 }
 
